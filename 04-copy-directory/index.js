@@ -4,10 +4,9 @@ const source = path.join(__dirname, 'files');
 const destination = path.join(__dirname, 'files-copy');
 
 let copyStyles = async (source, destination) => {
-  try{
-    await fs.promises.rm(destination, { recursive: true, force: true });
-    await fs.promises.mkdir(destination, { recursive: true });
-    
+  try {
+    await fs.promises.rm(destination, {recursive: true, force: true});
+    await fs.promises.mkdir(destination, {recursive: true});
     fs.promises.readdir(source)
       .then(filenames => {
         for (let filename of filenames) {
@@ -21,9 +20,9 @@ let copyStyles = async (source, destination) => {
       .catch(error => {
         throw error;
       });
-  } catch (error){
-    console.erroror(error);
+  } catch (error) {
+    console.error(error);
   }
 };
 
-copyStyles (source, destination);
+copyStyles(source, destination);

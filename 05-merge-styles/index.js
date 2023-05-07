@@ -20,7 +20,7 @@ const mergeFiles = async (source, destination) => {
       });
     }
   } catch (error){
-    console.erroror(error);
+    console.error(error);
   }
 };
 
