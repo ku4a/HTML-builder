@@ -11,16 +11,20 @@ const componentsSourcePath = path.join(__dirname, 'components');
 
 const createFolders = () => {
   try {
-    fs.mkdir(destinationDir, {recursive: true}, (err) => {
+    fs.mkdir(destinationDir, { recursive: true }, (err) => {
       if (err) {
         throw err;
       }
     });
-    fs.mkdir(path.join(destinationDir, 'assets'), {recursive: true}, (err) => {
-      if (err) {
-        throw err;
+    fs.mkdir(
+      path.join(destinationDir, 'assets'),
+      { recursive: true },
+      (err) => {
+        if (err) {
+          throw err;
+        }
       }
-    });
+    );
   } catch (err) {
     console.error('Error creating folders');
   }
@@ -28,7 +32,9 @@ const createFolders = () => {
 
 const mergeStyleFiles = async (sourceDir, destinationDir) => {
   try {
-    const writeableStream = fs.createWriteStream(path.join(destinationDir, 'style.css'));
+    const writeableStream = fs.createWriteStream(
+      path.join(destinationDir, 'style.css')
+    );
 
     const files = await fs.promises.readdir(sourceDir);
     for (let file of files) {
@@ -37,7 +43,10 @@ const mergeStyleFiles = async (sourceDir, destinationDir) => {
           throw err;
         }
         if (stats.isFile() && path.extname(file) === '.css') {
-          let readableStream = fs.createReadStream(path.join(sourceDir, path.basename(file)), 'utf8');
+          let readableStream = fs.createReadStream(
+            path.join(sourceDir, path.basename(file)),
+            'utf8'
+          );
           readableStream.pipe(writeableStream);
         }
       });
@@ -56,9 +65,12 @@ const copyAssetsDir = async (sourseDir, destDir) => {
           throw err;
         }
         if (stats.isFile()) {
-          fs.promises.copyFile(path.join(sourseDir, file), path.join(destDir, file));
+          fs.promises.copyFile(
+            path.join(sourseDir, file),
+            path.join(destDir, file)
+          );
         } else {
-          fs.mkdir(path.join(destDir, file), {recursive: true}, (err) => {
+          fs.mkdir(path.join(destDir, file), { recursive: true }, (err) => {
             if (err) {
               throw err;
             }
@@ -83,9 +95,13 @@ const createIndexFile = async () => {
 
 const replaceTags = async (templateData) => {
   const componentsFiles = await fs.promises.readdir(componentsSourcePath);
-  const htmlFiles = componentsFiles.filter(file => path.extname(file) === '.html');
+  const htmlFiles = componentsFiles.filter(
+    (file) => path.extname(file) === '.html'
+  );
   for (let htmlComponent of htmlFiles) {
-    const htmlComponentData = await fs.promises.readFile(path.join(componentsSourcePath, htmlComponent));
+    const htmlComponentData = await fs.promises.readFile(
+      path.join(componentsSourcePath, htmlComponent)
+    );
     const name = path.basename(htmlComponent, '.html');
     let canReplace = true;
     while (canReplace) {
@@ -99,7 +115,7 @@ const replaceTags = async (templateData) => {
   return templateData;
 };
 
-createFolders();
-mergeStyleFiles(stylesSourceDir, destinationDir);
-copyAssetsDir(assetsSourseDir, assetsDestinationDir);
-createIndexFile();
+new Promise(() => createFolders())
+  .then(new Promise(() => mergeStyleFiles(stylesSourceDir, destinationDir)))
+  .then(new Promise(() => copyAssetsDir(assetsSourseDir, assetsDestinationDir)))
+  .then(new Promise(() => createIndexFile()));
